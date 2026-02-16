@@ -1,0 +1,166 @@
+{
+  "name": "eloquent",
+  "displayName": "Eloquent",
+  "description": "AI-powered text-to-speech for VS Code. Select text and hear it read aloud.",
+  "version": "1.1.1",
+  "publisher": "jshwek",
+  "engines": {
+    "vscode": "^1.85.0"
+  },
+  "categories": [
+    "Other"
+  ],
+  "keywords": [
+    "tts",
+    "text-to-speech",
+    "speech",
+    "read aloud",
+    "accessibility",
+    "ai"
+  ],
+  "activationEvents": [],
+  "main": "./out/extension.js",
+  "icon": "media/icon.png",
+  "contributes": {
+    "commands": [
+      {
+        "command": "eloquent.readAloud",
+        "title": "Read Aloud",
+        "category": "Eloquent"
+      },
+      {
+        "command": "eloquent.stop",
+        "title": "Stop Reading",
+        "category": "Eloquent"
+      },
+      {
+        "command": "eloquent.selectProvider",
+        "title": "Select Provider",
+        "category": "Eloquent"
+      },
+      {
+        "command": "eloquent.selectVoice",
+        "title": "Select Voice",
+        "category": "Eloquent"
+      },
+      {
+        "command": "eloquent.setSpeed",
+        "title": "Set Speed",
+        "category": "Eloquent"
+      },
+      {
+        "command": "eloquent.openSettings",
+        "title": "Open Settings",
+        "category": "Eloquent"
+      }
+    ],
+    "menus": {
+      "editor/context": [
+        {
+          "command": "eloquent.readAloud",
+          "when": "editorHasSelection",
+          "group": "navigation"
+        }
+      ]
+    },
+    "keybindings": [
+      {
+        "command": "eloquent.readAloud",
+        "key": "ctrl+shift+r",
+        "mac": "cmd+shift+r",
+        "when": "editorHasSelection"
+      },
+      {
+        "command": "eloquent.stop",
+        "key": "escape",
+        "when": "eloquent.isPlaying"
+      }
+    ],
+    "configuration": {
+      "title": "Eloquent",
+      "properties": {
+        "eloquent.provider": {
+          "type": "string",
+          "enum": [
+            "openai",
+            "elevenlabs",
+            "azure",
+            "local"
+          ],
+          "enumDescriptions": [
+            "OpenAI TTS - High quality AI voices (requires API key)",
+            "ElevenLabs - Ultra-realistic AI voices (requires API key)",
+            "Azure Speech - Microsoft neural voices (requires API key)",
+            "Local TTS - Built-in system voices (free, no API key)"
+          ],
+          "default": "openai",
+          "description": "Text-to-speech provider to use",
+          "scope": "window"
+        },
+        "eloquent.openaiApiKey": {
+          "type": "string",
+          "default": "",
+          "description": "Your OpenAI API key for text-to-speech",
+          "scope": "application"
+        },
+        "eloquent.elevenlabsApiKey": {
+          "type": "string",
+          "default": "",
+          "description": "Your ElevenLabs API key",
+          "scope": "application"
+        },
+        "eloquent.azureApiKey": {
+          "type": "string",
+          "default": "",
+          "description": "Your Azure Speech API key",
+          "scope": "application"
+        },
+        "eloquent.azureRegion": {
+          "type": "string",
+          "default": "eastus",
+          "description": "Azure Speech region (e.g., eastus, westus, westeurope)",
+          "scope": "application"
+        },
+        "eloquent.voice": {
+          "type": "string",
+          "default": "nova",
+          "markdownDescription": "Voice to use for speech synthesis.\n\n**OpenAI:** alloy, echo, fable, onyx, nova, shimmer\n\n**ElevenLabs:** rachel, drew, clyde, paul, domi, dave, fin, sarah, antoni, thomas, charlie, emily, elli, callum, patrick, harry, liam, dorothy, josh, arnold, charlotte, alice, matilda, james, joseph, lily, jessica, michael, nicole, bill, george, adam\n\n**Azure:** jenny, guy, aria, davis, amber, brandon, christopher, cora, elizabeth, eric, jacob, michelle, monica, nancy, roger, sara, tony, sonia, ryan, libby, maisie",
+          "scope": "window"
+        },
+        "eloquent.speed": {
+          "type": "number",
+          "minimum": 0.25,
+          "maximum": 4,
+          "default": 1,
+          "description": "Speech speed (0.25 to 4.0)",
+          "scope": "window"
+        },
+        "eloquent.maxCharacters": {
+          "type": "number",
+          "default": 4096,
+          "description": "Maximum characters to read at once",
+          "scope": "window"
+        }
+      }
+    }
+  },
+  "scripts": {
+    "vscode:prepublish": "npm run compile",
+    "compile": "tsc -p ./",
+    "watch": "tsc -watch -p ./",
+    "lint": "eslint src --ext ts"
+  },
+  "devDependencies": {
+    "@types/node": "^20.10.0",
+    "@types/vscode": "^1.85.0",
+    "@typescript-eslint/eslint-plugin": "^6.13.0",
+    "@typescript-eslint/parser": "^6.13.0",
+    "eslint": "^8.54.0",
+    "typescript": "^5.3.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/jshwek/eloquent"
+  },
+  "license": "MIT"
+}
