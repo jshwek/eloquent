@@ -2,7 +2,7 @@
   "name": "eloquent",
   "displayName": "Eloquent",
   "description": "AI-powered text-to-speech for VS Code. Select text and hear it read aloud.",
-  "version": "1.1.1",
+  "version": "1.1.2",
   "publisher": "jshwek",
   "engines": {
     "vscode": "^1.85.0"
@@ -18,7 +18,9 @@
     "accessibility",
     "ai"
   ],
-  "activationEvents": [],
+  "activationEvents": [
+    "onStartupFinished"
+  ],
   "main": "./out/extension.js",
   "icon": "media/icon.png",
   "contributes": {
@@ -100,19 +102,22 @@
         "eloquent.openaiApiKey": {
           "type": "string",
           "default": "",
-          "description": "Your OpenAI API key for text-to-speech",
+          "description": "Deprecated. API keys are now stored in encrypted secret storage. Set your key via the \"Eloquent: Select Provider\" command instead.",
+          "markdownDeprecationMessage": "**Deprecated**: API keys are no longer stored in settings. Your key has been moved to encrypted secret storage. Set or update it with the **Eloquent: Select Provider** command.",
           "scope": "application"
         },
         "eloquent.elevenlabsApiKey": {
           "type": "string",
           "default": "",
-          "description": "Your ElevenLabs API key",
+          "description": "Deprecated. API keys are now stored in encrypted secret storage. Set your key via the \"Eloquent: Select Provider\" command instead.",
+          "markdownDeprecationMessage": "**Deprecated**: API keys are no longer stored in settings. Your key has been moved to encrypted secret storage. Set or update it with the **Eloquent: Select Provider** command.",
           "scope": "application"
         },
         "eloquent.azureApiKey": {
           "type": "string",
           "default": "",
-          "description": "Your Azure Speech API key",
+          "description": "Deprecated. API keys are now stored in encrypted secret storage. Set your key via the \"Eloquent: Select Provider\" command instead.",
+          "markdownDeprecationMessage": "**Deprecated**: API keys are no longer stored in settings. Your key has been moved to encrypted secret storage. Set or update it with the **Eloquent: Select Provider** command.",
           "scope": "application"
         },
         "eloquent.azureRegion": {

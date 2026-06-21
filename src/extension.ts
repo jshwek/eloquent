@@ -6,10 +6,17 @@ import { LocalTTSProvider } from './providers/local';
 import { TTSProvider } from './providers/base';
 import { HybridAudioPlayer } from './player/hybrid';
 import { StatusBarManager } from './ui/statusBar';
-import { getConfig, promptForApiKey, TTSProviderType } from './config';
+import {
+  getConfig,
+  getApiKey,
+  promptForApiKey,
+  migrateApiKeysFromSettings,
+  TTSProviderType
+} from './config';
 
 let audioPlayer: HybridAudioPlayer;
 let statusBar: StatusBarManager;
+let secrets: vscode.SecretStorage;
 let isPlaying = false;
 let suppressProviderChangePrompt = false;
 
@@ -20,29 +27,14 @@ const providerNames: Record<TTSProviderType, string> = {
   local: 'Local TTS'
 };
 
-function getProviderApiKey(provider: TTSProviderType): string {
-  const config = getConfig();
-  switch (provider) {
-    case 'openai':
-      return config.openaiApiKey;
-    case 'elevenlabs':
-      return config.elevenlabsApiKey;
-    case 'azure':
-      return config.azureApiKey;
-    case 'local':
-    default:
-      return '';
-  }
-}
-
 async function handleProviderKeyPrompt(provider: TTSProviderType): Promise<void> {
   if (provider === 'local') {
     return;
   }
 
-  const existingKey = getProviderApiKey(provider);
+  const existingKey = await getApiKey(secrets, provider);
   if (!existingKey) {
-    await promptForApiKey(provider);
+    await promptForApiKey(secrets, provider);
     return;
   }
 
@@ -53,7 +45,7 @@ async function handleProviderKeyPrompt(provider: TTSProviderType): Promise<void>
   );
 
   if (action === 'Update Key') {
-    await promptForApiKey(provider);
+    await promptForApiKey(secrets, provider);
   }
 }
 
@@ -89,6 +81,18 @@ function createProvider(providerType: TTSProviderType, apiKey: string, azureRegi
 export function activate(context: vscode.ExtensionContext) {
   audioPlayer = new HybridAudioPlayer(context);
   statusBar = new StatusBarManager();
+  secrets = context.secrets;
+
+  // Move any cleartext API keys left in settings.json (pre-1.1.2) into the
+  // encrypted secret store and erase the cleartext copies. Runs once per
+  // install where such keys still exist.
+  void migrateApiKeysFromSettings(secrets).then((migrated) => {
+    if (migrated) {
+      vscode.window.showInformationMessage(
+        'Eloquent: Your API key was moved out of settings.json into secure encrypted storage.'
+      );
+    }
+  });
 
   const synthesizeFromSelection = async (): Promise<Buffer | undefined> => {
     const editor = vscode.window.activeTextEditor;
@@ -117,9 +121,9 @@ export function activate(context: vscode.ExtensionContext) {
     const providerType = config.provider;
     let apiKey = '';
     if (providerType !== 'local') {
-      apiKey = getProviderApiKey(providerType);
+      apiKey = await getApiKey(secrets, providerType);
       if (!apiKey) {
-        const entered = await promptForApiKey(providerType);
+        const entered = await promptForApiKey(secrets, providerType);
         if (!entered) { return undefined; }
         apiKey = entered;
       }
@@ -174,7 +178,7 @@ export function activate(context: vscode.ExtensionContext) {
             'Cancel'
           );
           if (action === 'Update Key') {
-            const entered = await promptForApiKey(providerType);
+            const entered = await promptForApiKey(secrets, providerType);
             if (!entered) {
               return undefined;
             }
